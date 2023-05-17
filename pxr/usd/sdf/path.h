@@ -308,7 +308,7 @@ public:
     SdfPath() noexcept {
         // This generates a single instruction instead of 2 on gcc 6.3.  Seems
         // to be fixed on gcc 7+ and newer clangs.  Remove when we're there!
-        memset(this, 0, sizeof(*this));
+        memset((void*)this, 0, sizeof(*this));
     }
 
     /// Creates a path from the given string.
