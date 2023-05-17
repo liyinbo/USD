@@ -38,6 +38,8 @@
 #include <iostream>
 #include <vector>
 
+#include <string.h>
+
 using namespace std::placeholders;
 
 PXR_NAMESPACE_USING_DIRECTIVE
