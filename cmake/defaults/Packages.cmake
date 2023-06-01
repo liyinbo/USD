@@ -273,7 +273,7 @@ if (PXR_BUILD_IMAGING)
         add_definitions(-DPXR_VULKAN_SUPPORT_ENABLED)
     endif()
     # --Opensubdiv
-    set(OPENSUBDIV_USE_GPU ${PXR_ENABLE_GL_SUPPORT})
+    set(OPENSUBDIV_USE_GPU (${PXR_ENABLE_GL_SUPPORT} OR APPLEIOS))
     find_package(OpenSubdiv 3 REQUIRED)
     # --Ptex
     if (PXR_ENABLE_PTEX_SUPPORT)
@@ -293,6 +293,14 @@ if (PXR_BUILD_IMAGING)
     # --Embree
     if (PXR_BUILD_EMBREE_PLUGIN)
         find_package(Embree REQUIRED)
+    endif()
+    # --Apple
+    if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        if (APPLEIOS)
+            FIND_LIBRARY(UIKIT_LIBRARY UIKit)
+        else()
+            FIND_LIBRARY(APPKIT_LIBRARY AppKit)
+        endif()
     endif()
 endif()
 
