@@ -451,12 +451,11 @@ HgiMetalBlitCmds::FillBuffer(HgiBufferHandle const& buffer, uint8_t value)
 static bool
 _HgiTextureCanBeFiltered(HgiTextureDesc const &descriptor)
 {
-    HgiFormat const componentFormat =
-        HgiGetComponentBaseFormat(descriptor.format);
-
-    if (componentFormat == HgiFormatInt16 ||
-        componentFormat == HgiFormatUInt16 ||
-        componentFormat == HgiFormatInt32) {
+    HgiFormat const componentFormat = HgiGetComponentBaseFormat(format);
+    switch(componentFormat) {
+    case HgiFormatInt16:
+    case HgiFormatUInt16:
+    case HgiFormatInt32:
         return false;
     }
 
@@ -480,6 +479,20 @@ _HgiTextureCanBeFiltered(HgiTextureDesc const &descriptor)
 
     return false;
 }
+static const std::set<MTLPixelFormat> unfilterableIosFormats =
+{
+        {MTLPixelFormatRGBA32Float}
+};
+
+bool
+IsFilterable(MTLPixelFormat format)
+{
+#if defined(ARCH_OS_IOS)
+    return unfilterableIosFormats.find(format) == unfilterableIosFormats.end();
+#else
+    return true;
+#endif
+}
 
 void
 HgiMetalBlitCmds::GenerateMipMaps(HgiTextureHandle const& texture)
@@ -487,7 +500,9 @@ HgiMetalBlitCmds::GenerateMipMaps(HgiTextureHandle const& texture)
     HgiMetalTexture* metalTex = static_cast<HgiMetalTexture*>(texture.Get());
 
     if (metalTex) {
-        if (_HgiTextureCanBeFiltered(metalTex->GetDescriptor())) {
+        HgiFormat const format = metalTex->GetDescriptor().format;
+        if (_HgiCanBeFiltered(format)
+            && IsFilterable(metalTex->GetTextureId().pixelFormat)) {
             _CreateEncoder();
             [_blitEncoder generateMipmapsForTexture:metalTex->GetTextureId()];
         }
