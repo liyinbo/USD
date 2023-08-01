@@ -233,38 +233,43 @@ if (PXR_BUILD_IMAGING)
         add_definitions(-DPXR_METAL_SUPPORT_ENABLED)
     endif()
     if (PXR_ENABLE_VULKAN_SUPPORT)
-        if (EXISTS $ENV{VULKAN_SDK})
-            # Prioritize the VULKAN_SDK includes and packages before any system
-            # installed headers. This is to prevent linking against older SDKs
-            # that may be installed by the OS.
-            # XXX This is fixed in cmake 3.18+
-            include_directories(BEFORE SYSTEM $ENV{VULKAN_SDK} $ENV{VULKAN_SDK}/include $ENV{VULKAN_SDK}/lib)
-            set(ENV{PATH} "$ENV{VULKAN_SDK}:$ENV{VULKAN_SDK}/include:$ENV{VULKAN_SDK}/lib:$ENV{PATH}")
-            find_package(Vulkan REQUIRED)
-            list(APPEND VULKAN_LIBS Vulkan::Vulkan)
+        # Prioritize the VULKAN_SDK includes and packages before any system
+        # installed headers. This is to prevent linking against older SDKs
+        # that may be installed by the OS.
+        # XXX This is fixed in cmake 3.18+
+        find_package(Vulkan REQUIRED)
+        find_package(SPIRV-Tools CONFIG REQUIRED)
+        find_package(SPIRV-Tools-opt CONFIG REQUIRED)
+        find_package(spirv_cross_core CONFIG REQUIRED)
+        find_package(glslang CONFIG REQUIRED)
+        find_package(unofficial-shaderc_util CONFIG REQUIRED)
+        find_package(unofficial-shaderc CONFIG REQUIRED)
+        add_library(SPIRV-Tools ALIAS SPIRV-Tools-static)
+        list(APPEND VULKAN_LIBS
+            Vulkan::Vulkan
+            spirv-cross-core
+            unofficial::shaderc::shaderc
+            unofficial::shaderc_util::shaderc_util)
 
-            # Find the extra vulkan libraries we need
-            set(EXTRA_VULKAN_LIBS shaderc_combined)
-            foreach(EXTRA_LIBRARY ${EXTRA_VULKAN_LIBS})
-                find_library("${EXTRA_LIBRARY}_PATH" NAMES "${EXTRA_LIBRARY}" PATHS $ENV{VULKAN_SDK}/lib)
-                list(APPEND VULKAN_LIBS "${${EXTRA_LIBRARY}_PATH}")
-            endforeach()
+        # Find the extra vulkan libraries we need
+        #set(EXTRA_VULKAN_LIBS shaderc_combined)
+        foreach(EXTRA_LIBRARY ${EXTRA_VULKAN_LIBS})
+            find_library("${EXTRA_LIBRARY}_PATH" NAMES "${EXTRA_LIBRARY}" PATHS $ENV{VULKAN_SDK}/lib)
+            list(APPEND VULKAN_LIBS "${${EXTRA_LIBRARY}_PATH}")
+        endforeach()
 
-            # Find the OS specific libs we need
-            if (APPLE)
-                find_library(MVK_LIBRARIES NAMES MoltenVK PATHS $ENV{VULKAN_SDK}/lib)
-                list(APPEND VULKAN_LIBS ${MVK_LIBRARIES})
-            elseif (UNIX AND NOT APPLE)
-                find_package(X11 REQUIRED)
-                list(APPEND VULKAN_LIBS ${X11_LIBRARIES})
-            elseif (WIN32)
-                # No extra libs required
-            endif()
-
-            add_definitions(-DPXR_VULKAN_SUPPORT_ENABLED)
-        else()
-            message(FATAL_ERROR "VULKAN_SDK not valid")
+        # Find the OS specific libs we need
+        if (APPLE)
+            find_library(MVK_LIBRARIES NAMES MoltenVK PATHS $ENV{VULKAN_SDK}/lib)
+            list(APPEND VULKAN_LIBS ${MVK_LIBRARIES})
+        elseif (UNIX AND NOT APPLE)
+            find_package(X11 REQUIRED)
+            list(APPEND VULKAN_LIBS ${X11_LIBRARIES})
+        elseif (WIN32)
+            # No extra libs required
         endif()
+
+        add_definitions(-DPXR_VULKAN_SUPPORT_ENABLED)
     endif()
     # --Opensubdiv
     set(OPENSUBDIV_USE_GPU ${PXR_ENABLE_GL_SUPPORT})

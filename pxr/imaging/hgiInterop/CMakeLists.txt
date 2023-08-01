@@ -20,10 +20,16 @@ if (PXR_ENABLE_METAL_SUPPORT)
     list(APPEND optionalLibraries ${COREVIDEO_LIBRARY} hgiMetal)
     list(APPEND optionalCppFiles metal.mm)
     list(APPEND optionalPrivateHeaders metal.h)
-else()
+endif()
+if(PXR_ENABLE_GL_SUPPORT)
     # No OpenGL-to-OpenGL interop when using Metal.
     list(APPEND optionalCppFiles opengl.cpp)
     list(APPEND optionalPrivateHeaders opengl.h)
+endif()
+if(PXR_ENABLE_VULKAN_SUPPORT)
+    list(APPEND optionalLibraries hgiVulkan)
+    list(APPEND optionalCppFiles vulkan.cpp)
+    list(APPEND optionalPrivateHeaders vulkan.h)
 endif()
 
 pxr_library(hgiInterop
