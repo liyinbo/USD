@@ -27,7 +27,7 @@ pxr_library(garch
         arch
         tf
         ${X11_LIBRARIES}
-        ${OPENGL_gl_LIBRARY}
+        ${OPENGL_LIBRARIES}
         ${APPKIT_LIBRARY}
 
     INCLUDE_DIRS
