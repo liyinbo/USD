@@ -249,7 +249,8 @@ if (PXR_BUILD_IMAGING)
             Vulkan::Vulkan
             spirv-cross-core
             unofficial::shaderc::shaderc
-            unofficial::shaderc_util::shaderc_util)
+            $<IF:$<TARGET_EXISTS:unofficial::shaderc_util::shaderc_util>,unofficial::shaderc_util::shaderc_util,unofficial::shaderc::shaderc_util>
+            )
 
         # Find the extra vulkan libraries we need
         #set(EXTRA_VULKAN_LIBS shaderc_combined)
