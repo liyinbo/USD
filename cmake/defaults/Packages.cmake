@@ -242,7 +242,7 @@ if (PXR_BUILD_IMAGING)
         find_package(SPIRV-Tools-opt CONFIG REQUIRED)
         find_package(spirv_cross_core CONFIG REQUIRED)
         find_package(glslang CONFIG REQUIRED)
-        find_package(unofficial-shaderc_util CONFIG REQUIRED)
+        find_package(unofficial-shaderc_util CONFIG)
         find_package(unofficial-shaderc CONFIG REQUIRED)
         add_library(SPIRV-Tools ALIAS SPIRV-Tools-static)
         list(APPEND VULKAN_LIBS
