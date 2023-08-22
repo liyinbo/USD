@@ -89,8 +89,4 @@ RESOURCE_FILES
 
 DOXYGEN_FILES
     overview.dox
-<<<<<<< HEAD
 )
-=======
-)
->>>>>>> d7e7e527e (iOS long term support)
