@@ -1,20 +1,14 @@
 set(PXR_PREFIX pxr/imaging)
 set(PXR_PACKAGE garch)
 
-if ((NOT ${PXR_ENABLE_GL_SUPPORT}))
-    message(STATUS
-        "Skipping ${PXR_PACKAGE} because PXR_ENABLE_GL_SUPPORT and PXR_ENABLE_METAL_SUPPORT is OFF")
-    return()
-endif()
-
 if(APPLE)
     set(GARCH_GLPLATFORMCONTEXT       glPlatformContextDarwin)
     set(GARCH_GLPLATFORMDEBUGWINDOW   glPlatformDebugWindowDarwin)
     set(GARCH_SOURCE_EXTENSION        mm)
-    if (NOT APPLEIOS)
+    if (NOT APPLEIOS OR PXR_ENABLE_GL_SUPPORT)
         list(APPEND optionalLibs      ${APPKIT_LIBRARY})
     endif()
-    if (APPLEIOS)
+    if (APPLEIOS OR NOT PXR_ENABLE_GL_SUPPORT)
         FIND_LIBRARY(UIKIT_LIBRARY UIKit)
     else()
         FIND_LIBRARY(APPKIT_LIBRARY AppKit)
