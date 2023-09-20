@@ -1093,6 +1093,10 @@ function(pxr_toplevel_epilogue)
                 ${PXR_MALLOC_LIBRARY}
                 ${PXR_THREAD_LIBS}
         )
+        if (IOS)
+            find_library(FOUNDATION_LIBRARY Foundation)
+            target_link_libraries(usd_ms PRIVATE ${FOUNDATION_LIBRARY})
+        endif()
 
         _pxr_init_rpath(rpath "${libInstallPrefix}")
         _pxr_add_rpath(rpath "${CMAKE_INSTALL_PREFIX}/${PXR_INSTALL_SUBDIR}/lib")
@@ -1219,6 +1223,31 @@ function(pxr_monolithic_epilogue)
             "${PROJECT_BINARY_DIR}/usd-imports-$<CONFIG>.cmake"
         COMMAND ${CMAKE_COMMAND} -E echo Export file: ${PROJECT_BINARY_DIR}/usd-targets-$<CONFIG>.cmake
         COMMAND ${CMAKE_COMMAND} -E echo Import file: ${PROJECT_BINARY_DIR}/usd-imports-$<CONFIG>.cmake
+    )
+    _get_folder("" folder)
+    _get_library_prefix(libPrefix)
+    set_target_properties(usd_m
+        PROPERTIES
+            FOLDER "${folder}"
+            PREFIX "${libPrefix}"
+            IMPORT_PREFIX "${libPrefix}"
+    )
+    _get_install_dir("lib" libInstallPrefix)
+    foreach(lib ${PXR_OBJECT_LIBS})
+        install(
+            TARGETS ${lib}
+            EXPORT pxrTargets
+            LIBRARY DESTINATION ${libInstallPrefix}
+            ARCHIVE DESTINATION ${libInstallPrefix}
+            RUNTIME DESTINATION ${libInstallPrefix}
+        )
+    endforeach()
+    install(
+        TARGETS usd_m
+        EXPORT pxrTargets
+        LIBRARY DESTINATION ${libInstallPrefix}
+        ARCHIVE DESTINATION ${libInstallPrefix}
+        RUNTIME DESTINATION ${libInstallPrefix}
     )
 endfunction() # pxr_monolithic_epilogue
 
