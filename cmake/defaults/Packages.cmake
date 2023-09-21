@@ -152,8 +152,9 @@ endif()
 
 
 # --TBB
-find_package(TBB REQUIRED COMPONENTS tbb)
-add_definitions(${TBB_DEFINITIONS})
+find_package(TBB CONFIG REQUIRED COMPONENTS tbb)
+set(TBB_tbb_LIBRARY TBB::tbb)
+#add_definitions(${TBB_DEFINITIONS})
 
 # --math
 if(WIN32)
